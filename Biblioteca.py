@@ -26,11 +26,6 @@ class Bibliotecario(Persona):
     def mostrar_info(self):
         return f"Bibliotecario: {self.nombre} {self.apellido}"
 
-# u= Usuario('Pepe', 'Lopez', 12345678, 'pepe@mail.com')
-# print(u.mostrar_info())
-# b= Bibliotecario('Marcos', 'Gomez', 32,)
-# print(b.mostrar_info())
-
 #2. Creación de la Clase Libro
 class Libro ():
     def __init__(self, titulo, autor, isbn, ano_publicacion, cant_paginas):
@@ -49,12 +44,70 @@ class Libro ():
             "Cantidad de Páginas": self.cant_paginas
         }
 
-# libro1 = Libro("El Principito", "Antoine de Saint-Exupéry", 123, 1943, 120)
-# libro2 = Libro("1984", "George Orwell", 456, 1949, 328)
-# libro3 = Libro("Don Quijote", "Miguel de Cervantes", 789, 1605, 863)
+#3. Creación de la Clase biblioteca
+class Biblioteca():
+    def __init__(self):
+        self.libros= []
 
-# biblioteca = [libro1, libro2, libro3]
+    def altaLibro(self, libro):
+        self.libros.append(libro)
+    
+    def listaLibrosActuales(self):
+        print('------------ Nuestros Libros Actuales----------')
+        for libro in self.libros:
+            print(f"Libro: ${libro.mostrar_libro()}")
 
-# for libro in biblioteca:
-#     print(libro.mostrar_libro())
+    def listaLibrosActualizados(self):
+        print('------------ Nuestros Libros Actualizados----------')
+        for libro in self.libros:
+            print(f"Libro: ${libro.mostrar_libro()}")
 
+    def modificarLibro(self, isbn, tituloNuevo=None, autorNuevo=None):
+        for libro in self.libros:
+            if libro.isbn == isbn:
+                libro.titulo = tituloNuevo or libro.titulo
+                libro.autor = autorNuevo or libro.autor
+                return True
+        return False
+    
+    def baja(self, isbn):
+        for libro in self.libros:
+            if libro.isbn == isbn:
+                self.libros.remove(libro)
+                return True
+        return False
+
+# PRUEBAS DE BIBLIOTECA Y CRUD LIBROS
+biblioteca = Biblioteca()
+
+libro1 = Libro("Harry Potter", "J.K. Rowling", "123", 1997, 300)
+libro2 = Libro("El Hobbit", "Tolkien", "456", 1937, 310)
+libro3 = Libro("El libro troll", "El Rubius", "789", 2014, 310)
+libro4 = Libro("Lyna Familia anormal", "Lyna Vallejos", "1011", 2018, 310)
+
+# Alta de Libros
+biblioteca.altaLibro(libro1)
+biblioteca.altaLibro(libro2)
+biblioteca.altaLibro(libro3)
+biblioteca.altaLibro(libro4)
+
+# Listado
+biblioteca.listaLibrosActuales()
+
+# Modificacion de datos
+biblioteca.modificarLibro("123", tituloNuevo="Harry Potter 2")
+
+# Listado Final
+biblioteca.listaLibrosActualizados()
+
+# Baja de Libros
+biblioteca.baja("1011")
+
+# Listado Final
+biblioteca.listaLibrosActualizados()
+
+# PRUEBAS DE USUARIO
+# u= Usuario('Pepe', 'Lopez', 12345678, 'pepe@mail.com')
+# print(u.mostrar_info())
+# b= Bibliotecario('Marcos', 'Gomez', 32,)
+# print(b.mostrar_info())
