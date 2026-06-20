@@ -14,16 +14,17 @@ class mostrarInfo(type):
 
 # 1. Creación de la Clase Persona y sus Herencias
 class Persona(metaclass=mostrarInfo):
-    def __init__(self, nombre, apellido):
+    def __init__(self, nombre, apellido, pin):
         self.nombre= nombre
         self.apellido= apellido
+        self.pin= pin
 
     def mostrar_info(self):
         return (f'{self.nombre} {self.apellido}')
 
 class Usuario(Persona):
-    def __init__(self, nombre, apellido, dni, email):
-        super().__init__(nombre, apellido)
+    def __init__(self, nombre, apellido, dni, email, pin):
+        super().__init__(nombre, apellido, pin)
         self.dni= dni
         self.email= email
 
@@ -35,8 +36,8 @@ class Usuario(Persona):
     )
 
 class Bibliotecario(Persona):
-    def __init__(self, nombre, apellido, legajo):
-        super().__init__(nombre, apellido)
+    def __init__(self, nombre, apellido, legajo, pin):
+        super().__init__(nombre, apellido, pin)
         self.legajo= legajo
 
     def mostrar_info(self):
@@ -128,7 +129,6 @@ class Biblioteca():
             cls._instancia = super().__new__(cls)
         return cls._instancia
 
-
     def __init__(self):
         if getattr(self, "_inicializado", False):
             return
@@ -136,7 +136,9 @@ class Biblioteca():
         self.libros = []
         self.usuarios = []
         self.prestamos = []
+        self.bibliotecarios= []
         self._inicializado = True
+
     # CRUD DE LIBROS
     def altaLibro(self, libro):
         self.libros.append(libro)
@@ -280,8 +282,8 @@ biblioteca.bajaLibro("1011")
 biblioteca.listaLibrosActualizados()
 
 # -------- PRUEBAS DE BIBLIOTECA Y CRUD LIBROS --------
-usuario1 = Usuario("Juan", "Pérez", 12345678, "juan@gmail.com")
-usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com")
+usuario1 = Usuario("Juan", "Pérez", 12345678, "juan@gmail.com", 1234)
+usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com", 1234)
 # Alta de usuarios
 biblioteca.altaUsuario(usuario1)
 biblioteca.altaUsuario(usuario2)
@@ -320,8 +322,8 @@ biblioteca.registroDePrestamo("123",99999999)
 
 
 # -------- PRUEBAS DE POLIMORFISMO --------
-bibliotecario1 = Bibliotecario("Carlos", "López", "LEG-001")
-bibliotecario2 = Bibliotecario("Ana", "Martínez", "LEG-002")
+bibliotecario1 = Bibliotecario("Carlos", "López", "LEG-001", 9876)
+bibliotecario2 = Bibliotecario("Ana", "Martínez", "LEG-002", 6789)
 
 print("\n=== DEMOSTRACIÓN DE POLIMORFISMO ===")
 
@@ -347,6 +349,148 @@ print(prestamoDemo.mostrar_info())
 print("\n=== PRUEBA DE SINGLETON ===")
 b1 = Biblioteca()
 b2 = Biblioteca()
-print(b1 is b2)  # True → son la misma instancia
-b1.libros.append("Harry Potter")
-print(b2.libros)
+print(b1 is b2)
+libro_prueba = Libro("Harry Potter","J.K. Rowling","999",1997,300)
+b1.libros.append(libro_prueba)
+for libro in b2.libros:
+    print(libro.mostrar_info())
+
+
+def menuUsuario(usuario, biblioteca):
+    print(               
+        f'-------------------- Menú --------------------\n'
+        f'Hola, {usuario.nombre} {usuario.apellido}!\n'
+        f'Por favor Indique la opción que desea ejecutar:\n'
+        f'1. Prestamo de un Libro.\n'
+        f'2. Devolución de un Libro.\n'
+        f'3. Modificar un dato de mi cuenta.\n'
+        f'0. Salir.\n'
+        f'----------------------------------------------')
+    opcion=input('Ingrese opción deseada: ')
+    while True :
+        if opcion == '1':
+            print('111')
+            break
+        elif opcion == '2':
+            print('222')
+            break
+        elif opcion == '3':
+            print('333')
+            break
+        elif opcion == '0':
+            print('Hasta Luego!')
+            break
+        else:
+            print(
+                f'-------------------- Menú --------------------\n'
+                f'Opción NO valida\n'
+                f'Por favor Indique la opción que desea ejecutar:\n'
+                f'1. Prestamo de un Libro.\n'
+                f'2. Devolución de un Libro.\n'
+                f'3. Modificar un dato de mi cuenta.\n'
+                f'0. Salir.\n'
+                f'----------------------------------------------')
+            opcion=input('Ingrese opción deseada: ')
+# menuUsuario(usuario=usuario1 ,biblioteca='')
+
+def menuBibliotecario(bibliotecario, biblioteca):
+    print(               
+        f'-------------------- Menú --------------------\n'
+        f'Hola, {bibliotecario.nombre} {bibliotecario.apellido} - Legajo N° {bibliotecario.legajo}\n'
+        f'Por favor Indique la opción que desea ejecutar:\n'
+        f'1. Alta de un Libro.\n'
+        f'2. Listado de Libros.\n'
+        f'3. Modigicación de un Libro.\n'
+        f'4. Baja de un Libro.\n'
+        f'5. Prestamos Vigentes.\n'
+        f'6. Lista de Usuarios.\n'
+        f'7. Baja de Usuarios.\n'
+        f'0. Salir.\n'
+        f'----------------------------------------------')
+    opcion=input('Ingrese opción deseada: ')
+
+    while True:
+        if opcion == '1':
+            print('111')
+            break
+        elif opcion == '2':
+            print('222')
+            break
+        elif opcion == '3':
+            print('333')
+            break
+        elif opcion == '4':
+            print('444')
+            break
+        elif opcion == '5':
+            print('555')
+            break
+        elif opcion == '6':
+            print('666')
+            break
+        elif opcion == '7':
+            print('777')
+            break
+        elif opcion == '0':
+            print('Hasta Luego!')
+            break
+        else:
+            print(               
+                f'-------------------- Menú --------------------\n'
+                f'Opción NO Valida\n'
+                f'Por favor Indique la opción que desea ejecutar:\n'
+                f'1. Alta de un Libro.\n'
+                f'2. Listado de Libros.\n'
+                f'3. Modigicación de un Libro.\n'
+                f'4. Baja de un Libro.\n'
+                f'5. Prestamos Vigentes.\n'
+                f'6. Lista de Usuarios.\n'
+                f'7. Baja de Usuarios.\n'
+                f'0. Salir.\n'
+                f'----------------------------------------------')
+            opcion=input('Ingrese opción deseada: ')
+# menuBibliotecario(bibliotecario=bibliotecario1, biblioteca='')
+
+def menuPrincipal():
+    print(
+        f'-------------------- Menú --------------------\n'
+        f'Bienvenido/a a la Biblioteca UNAB\n'
+        f'Por favor Indique la opción que desea ejecutar:\n'
+        f'1. Iniciar Sesión.\n'
+        f'2. Registrarme.\n'
+        f'0. Salir.\n'
+        f'----------------------------------------------'
+    )
+    opcion=input('Ingrese opción deseada: ')
+    while True:
+        if opcion == '1':
+            print('Opcion 1')
+            break
+        elif opcion == '2':
+            print(
+                f'---------- Registro de Usuario ----------\n'
+                f'Por favor, complete los siguientes campos:'
+            )
+            n=input('Nombre: ')
+            a=input('Apellido: ')
+            d=int(input('DNI: (Solo Números sin . ni -)'))
+            e=input('Email: ')
+            p=int(input('Pin: (Solo Números)'))
+            nuevoUsuario= Usuario(nombre=n, apellido=a, dni=d, email=e, pin=p)
+            biblioteca.altaUsuario(nuevoUsuario)
+            break
+        elif opcion == '0':
+            print ('Hasta Luego!')
+            break
+        else:
+            print(
+                f'-------------------- Menú --------------------\n'
+                f'Opción NO valida.\n'
+                f'Por favor Indique la opción que desea ejecutar:\n'
+                f'1. Iniciar Sesión.\n'
+                f'2. Registrarme.\n'
+                f'0. Salir.\n'
+                f'----------------------------------------------'
+            )
+            opcion=input('Ingrese opción deseada: ')
+menuPrincipal()
