@@ -1,15 +1,15 @@
 # 📚 TIF - Sistema de Gestión de Biblioteca Digital.
 
-## Descripción:
+## 📄 Descripción:
 En este repositorio, se encuentra el Proyecto del Trabajo Integrador Final (TIF) del Grupo N°16. El mismo siendo correspondiente de la materia **"Programación Avanzada"**, dictada por el profesor **Diego Luparello** en la Universidad Nacional Guillermo Brown (UNAB). 
 
-## Datos de la Cursada:
+## 🌐 Datos de la Cursada:
 - Profesor: Diego Luparello
 - Comisión: N°3
 - Grupo N°16
 - Universidad Nacional Guillermo Brown (UNAB)
 
-## Datos de los Integrantes:
+## 🧑‍🧑‍🧒‍🧒 Datos de los Integrantes:
 - Bustos Lisandro
 - Cossio Benjamin
 - Gonzalez Enzo
