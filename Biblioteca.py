@@ -128,10 +128,15 @@ class Biblioteca():
             cls._instancia = super().__new__(cls)
         return cls._instancia
 
+
     def __init__(self):
-        self.libros= []
+        if getattr(self, "_inicializado", False):
+            return
+
+        self.libros = []
         self.usuarios = []
-        self.prestamos= []
+        self.prestamos = []
+        self._inicializado = True
     # CRUD DE LIBROS
     def altaLibro(self, libro):
         self.libros.append(libro)
@@ -139,7 +144,7 @@ class Biblioteca():
     @mensajeListadoActuales
     def listaLibrosActuales(self):
         for libro in self.libros:
-            print(f"Libro: ${libro.mostrar_libro()}")
+            print(f"Libro: {libro.mostrar_libro()}")
 
     @mensajeListadoActualizado
     def listaLibrosActualizados(self):
@@ -155,11 +160,11 @@ class Biblioteca():
                 return True
         return False
     
-    def baja(self, isbn):
+    def bajaLibro(self, isbn):
         for libro in self.libros:
             if libro.isbn == isbn:
                 self.libros.remove(libro)
-                print(f'El libro con ID:"{libro.isbn}" fue  con Éxito!')
+                print(f'El libro con ID:"{libro.isbn}" fue eliminado con Éxito!')
                 return True
         return False
     
@@ -171,7 +176,7 @@ class Biblioteca():
     @mensajeListadoActuales
     def listaUsuariosActuales(self):
         for usuario in self.usuarios:
-            print(f"Usuario: ${usuario.mostrar_info()}")
+            print(f"Usuario: {usuario.mostrar_info()}")
 
     @mensajeListadoActualizado
     def listaUsuariosActualizados(self):
@@ -184,8 +189,8 @@ class Biblioteca():
                 u.nombre = nuevoNombre or u.nombre
                 u.apellido = nuevoApellido or u.apellido
                 u.email = nuevoEmail or u.email
-            print(f'El usuario con DNI "{dni}" fue modificado con éxito.')
-            return True
+                print(f'El usuario con DNI "{dni}" fue modificado con éxito.')
+                return True
         return False
     
     def bajaUsuario(self,dni):
@@ -193,7 +198,7 @@ class Biblioteca():
             if u.dni == dni:
                 self.usuarios.remove(u)
                 print(f'El usuario con DNI "{dni}" fue eliminado con éxito.')
-            return True
+                return True
         return False
     
     # CRUD DE PRESTAMOS
@@ -270,7 +275,7 @@ biblioteca.modificarLibro("123", tituloNuevo="Harry Potter 2")
 # Listado Actualizado
 biblioteca.listaLibrosActualizados()
 # Baja de Libros
-biblioteca.baja("1011")
+biblioteca.bajaLibro("1011")
 # Listado Final
 biblioteca.listaLibrosActualizados()
 
@@ -343,3 +348,5 @@ print("\n=== PRUEBA DE SINGLETON ===")
 b1 = Biblioteca()
 b2 = Biblioteca()
 print(b1 is b2)  # True → son la misma instancia
+b1.libros.append("Harry Potter")
+print(b2.libros)
