@@ -11,7 +11,7 @@ En este repositorio, se encuentra el Proyecto del Trabajo Integrador Final (TIF)
 
 ## 📋 Datos de los Integrantes:
 - Bustos Lisandro - 47.217.864
-- Cossio Benjamin
+- Cossio Benjamin - 47.877.576
 - Gonzalez Enzo
 - Palacios Franco
 
