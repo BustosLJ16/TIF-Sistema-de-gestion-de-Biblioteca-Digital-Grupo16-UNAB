@@ -1,13 +1,20 @@
 # Trabajo Integrador Final Grupo N°16 - Sistema de Gestión de Biblioteca Digital.
 
-#1. Creación de la Clase Persona y sus Herencias
+# Importación de dateTime para registro de Prestamos
+from datetime import date
+
+# 1. Creación de la Clase Persona y sus Herencias
 class Persona():
     def __init__(self, nombre, apellido):
         self.nombre= nombre
         self.apellido= apellido
 
     def mostrar_info(self):
-        return f"{self.nombre} {self.apellido}"
+        return (
+        f"{self.nombre} {self.apellido} "
+        f"- DNI: {self.dni} "
+        f"- Email: {self.email}"
+    )
 
 class Usuario(Persona):
     def __init__(self, nombre, apellido, dni, email):
@@ -15,18 +22,12 @@ class Usuario(Persona):
         self.dni= dni
         self.email= email
 
-    def mostrar_info(self):
-        return f"Usuario: {self.nombre} {self.apellido}"
-
 class Bibliotecario(Persona):
     def __init__(self, nombre, apellido, legajo):
         super().__init__(nombre, apellido)
         self.legajo= legajo
-        
-    def mostrar_info(self):
-        return f"Bibliotecario: {self.nombre} {self.apellido}"
 
-#2. Creación de la Clase Libro
+# 2. Creación de la Clase Libro
 class Libro ():
     def __init__(self, titulo, autor, isbn, ano_publicacion, cant_paginas):
         self.titulo= titulo
@@ -44,29 +45,70 @@ class Libro ():
             "Cantidad de Páginas": self.cant_paginas
         }
 
-#3. Creación de la Clase biblioteca
+# 3. Creación de la Clase Prestamo
+class Prestamo():
+    def __init__(self, libro, usuario):
+        self.libro = libro
+        self.usuario = usuario
+        self.fechaDePrestamo= date.today()
+        self.fechaDeDevolucion= None
+    
+    def devolucion(self):
+        self.fechaDeDevolucion= date.today()
+
+    def prestamoActivo(self):
+        return self.fechaDeDevolucion is None
+    
+    def mostrarInfoPrestamo(self):
+        return (
+            f"Libro: {self.libro.titulo} | "
+            f"Usuario: {self.usuario.nombre} {self.usuario.apellido} | "
+            f"Fecha préstamo: {self.fechaDePrestamo} | "
+            f"Fecha devolución: {self.fechaDeDevolucion}"
+        )
+
+
+# 4. Creación de la Clase biblioteca
+# Mensajes utilizando Decoradores 
+def mensajeListadoActuales(func):
+    def wrapped(*args, **kwargs):
+        print("=== Datos Actuales ===")
+        return func(*args, **kwargs)
+    return wrapped
+
+def mensajeListadoActualizado(func):
+    def wrapped(*args, **kwargs):
+        print("=== Datos Actualizados ===")
+        return func(*args, **kwargs)
+    return wrapped
+
+
 class Biblioteca():
+    # CRUD DE LIBROS
     def __init__(self):
         self.libros= []
+        self.usuarios = []
+        self.prestamos= []
 
     def altaLibro(self, libro):
         self.libros.append(libro)
     
+    @mensajeListadoActuales
     def listaLibrosActuales(self):
-        print('------------ Nuestros Libros Actuales----------')
         for libro in self.libros:
             print(f"Libro: ${libro.mostrar_libro()}")
 
+    @mensajeListadoActualizado
     def listaLibrosActualizados(self):
-        print('------------ Nuestros Libros Actualizados----------')
         for libro in self.libros:
-            print(f"Libro: ${libro.mostrar_libro()}")
+            print(f"Libro: {libro.mostrar_libro()}")
 
     def modificarLibro(self, isbn, tituloNuevo=None, autorNuevo=None):
         for libro in self.libros:
             if libro.isbn == isbn:
                 libro.titulo = tituloNuevo or libro.titulo
                 libro.autor = autorNuevo or libro.autor
+                print(f'El libro con ID:"{libro.isbn}" fue Modificado con Éxito!')
                 return True
         return False
     
@@ -74,8 +116,98 @@ class Biblioteca():
         for libro in self.libros:
             if libro.isbn == isbn:
                 self.libros.remove(libro)
+                print(f'El libro con ID:"{libro.isbn}" fue  con Éxito!')
                 return True
         return False
+    
+    # CRUD USUARIOS
+    def altaUsuario(self, usuario):
+        self.usuarios.append(usuario)
+        print(f'El usuario "{usuario.nombre} {usuario.apellido}", fue agregado con exito!')
+
+    @mensajeListadoActuales
+    def listaUsuariosActuales(self):
+        for usuario in self.usuarios:
+            print(f"Usuario: ${usuario.mostrar_info()}")
+
+    @mensajeListadoActualizado
+    def listaUsuariosActualizados(self):
+        for usuario in self.usuarios:
+            print(f"Usuarios: {usuario.mostrar_info()}")
+
+    def modificarUsuario(self, dni, nuevoNombre=None, nuevoApellido=None, nuevoEmail=None):
+        for u in self.usuarios:
+            if u.dni == dni:
+                u.nombre = nuevoNombre or u.nombre
+                u.apellido = nuevoApellido or u.apellido
+                u.email = nuevoEmail or u.email
+            print(f'El usuario con DNI "{dni}" fue modificado con éxito.')
+            return True
+        return False
+    
+    def bajaUsuario(self,dni):
+        for u in self.usuarios:
+            if u.dni == dni:
+                self.usuarios.remove(u)
+                print(f'El usuario con DNI "{dni}" fue eliminado con éxito.')
+            return True
+        return False
+    
+    # CRUD DE PRESTAMOS
+    def registroDePrestamo(self, isbn, dni):
+        libroEncontrado= None
+        for l in self.libros:
+            if l.isbn == isbn:
+                libroEncontrado = l 
+                break
+
+        usuarioEncontrado= None
+        for u in self.usuarios:
+            if u.dni == dni:
+                usuarioEncontrado= u
+                break
+
+        if libroEncontrado is None:
+                print("Libro no encontrado.")
+                return False
+
+        if usuarioEncontrado is None:
+            print("Usuario no encontrado.")
+            return False
+
+        for prestamo in self.prestamos:
+            if prestamo.libro.isbn == isbn and prestamo.prestamoActivo():
+                print("El libro ya está prestado.")
+                return False
+
+        nuevoPrestamo = Prestamo(libroEncontrado, usuarioEncontrado)
+        self.prestamos.append(nuevoPrestamo)
+        print("Préstamo registrado con éxito.")
+        return True
+    
+    def registrarDevolucion(self,isbn):
+        for p in self.prestamos:
+            if p.libro.isbn == isbn and p.prestamoActivo():
+                p.devolucion()
+                print("Devolución registrada con éxito.")
+                return True
+            else:
+                print("No existe préstamo activo para ese libro.")
+        return False
+    
+    def listarPrestamosActivos(self):
+        print("=== PRÉSTAMOS ACTIVOS ===")
+        hay_prestamos = False
+
+        for p in self.prestamos:
+            if p.prestamoActivo():
+                print(p.mostrarInfoPrestamo())
+                hay_prestamos = True
+
+        if not hay_prestamos:
+            print("No hay préstamos activos.")
+
+# PRUEBAS 
 
 # PRUEBAS DE BIBLIOTECA Y CRUD LIBROS
 biblioteca = Biblioteca()
@@ -97,7 +229,7 @@ biblioteca.listaLibrosActuales()
 # Modificacion de datos
 biblioteca.modificarLibro("123", tituloNuevo="Harry Potter 2")
 
-# Listado Final
+# Listado Actualizado
 biblioteca.listaLibrosActualizados()
 
 # Baja de Libros
@@ -106,8 +238,52 @@ biblioteca.baja("1011")
 # Listado Final
 biblioteca.listaLibrosActualizados()
 
-# PRUEBAS DE USUARIO
-# u= Usuario('Pepe', 'Lopez', 12345678, 'pepe@mail.com')
-# print(u.mostrar_info())
-# b= Bibliotecario('Marcos', 'Gomez', 32,)
-# print(b.mostrar_info())
+# PRUEBAS DE BIBLIOTECA Y CRUD LIBROS
+usuario1 = Usuario("Juan", "Pérez", 12345678, "juan@gmail.com")
+usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com")
+
+# Alta de usuarios
+biblioteca.altaUsuario(usuario1)
+biblioteca.altaUsuario(usuario2)
+
+# Listado de usuarios
+biblioteca.listaUsuariosActuales()
+
+# Modificacion de datos
+biblioteca.modificarUsuario(12345678, nuevoEmail="juanperez@gmail.com")
+
+# Listado Actualizado
+biblioteca.listaUsuariosActualizados()
+
+# Baja de Usuario
+biblioteca.bajaUsuario(87654321)
+
+# Listado Final
+biblioteca.listaLibrosActualizados()
+
+
+# PRUEBAS DE CRUD PRESTAMOS
+
+# Registo de Prestamos
+biblioteca.registroDePrestamo("123",12345678)
+
+# Lista de Prestamos Activos
+biblioteca.listarPrestamosActivos()
+
+# Registo de Prestamos 2
+biblioteca.registroDePrestamo("123",87654321)
+
+# Prueba de registro del mismo libro
+biblioteca.registroDePrestamo("456",87654321)
+
+# Ver préstamos activos
+biblioteca.listarPrestamosActivos()
+
+# Registrar devolución
+biblioteca.registrarDevolucion("123")
+
+# Ver préstamos activos luego de la devolución
+biblioteca.listarPrestamosActivos()
+
+# Intentar devolver nuevamente
+biblioteca.registrarDevolucion("123")
