@@ -121,12 +121,18 @@ def mensajeListadoActualizado(func):
 
 
 class Biblioteca():
-    # CRUD DE LIBROS
+    _instancia = None  # ← guarda la única instancia
+
+    def __new__(cls):
+        if cls._instancia is None:
+            cls._instancia = super().__new__(cls)
+        return cls._instancia
+
     def __init__(self):
         self.libros= []
         self.usuarios = []
         self.prestamos= []
-
+    # CRUD DE LIBROS
     def altaLibro(self, libro):
         self.libros.append(libro)
     
@@ -332,3 +338,8 @@ biblioteca.registrarDevolucion("123")
 # Mostramos el mismo préstamo ahora DEVUELTO
 print("\n--- Info de préstamo devuelto ---")
 print(prestamoDemo.mostrar_info())
+
+print("\n=== PRUEBA DE SINGLETON ===")
+b1 = Biblioteca()
+b2 = Biblioteca()
+print(b1 is b2)  # True → son la misma instancia
