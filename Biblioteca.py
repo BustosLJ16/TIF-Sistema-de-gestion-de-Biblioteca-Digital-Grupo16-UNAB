@@ -1,13 +1,31 @@
 # Trabajo Integrador Final Grupo N°16 - Sistema de Gestión de Biblioteca Digital.
 
 # Importación de dateTime para registro de Prestamos
-from datetime import date
+from datetime import date, timedelta
+
+# 0. Creación de la MetaClase Mostrar_Info (Para garantizar la renderización de datos)
+class mostrarInfo(type):
+    def __new__(cls, name, bases, atributos):
+        if 'mostrar_info' not in atributos:
+            raise TypeError(
+                f'La clase: {name} debe tener un método de mostrar_Info() Obligatoriamente.'
+            )
+        return super().__new__(cls, name, bases, atributos)
 
 # 1. Creación de la Clase Persona y sus Herencias
-class Persona():
+class Persona(metaclass=mostrarInfo):
     def __init__(self, nombre, apellido):
         self.nombre= nombre
         self.apellido= apellido
+
+    def mostrar_info(self):
+        return (f'{self.nombre} {self.apellido}')
+
+class Usuario(Persona):
+    def __init__(self, nombre, apellido, dni, email):
+        super().__init__(nombre, apellido)
+        self.dni= dni
+        self.email= email
 
     def mostrar_info(self):
         return (
@@ -16,19 +34,19 @@ class Persona():
         f"- Email: {self.email}"
     )
 
-class Usuario(Persona):
-    def __init__(self, nombre, apellido, dni, email):
-        super().__init__(nombre, apellido)
-        self.dni= dni
-        self.email= email
-
 class Bibliotecario(Persona):
     def __init__(self, nombre, apellido, legajo):
         super().__init__(nombre, apellido)
         self.legajo= legajo
 
+    def mostrar_info(self):
+        return (
+        f"{self.nombre} {self.apellido} "
+        f"- Legajo: {self.legajo}"
+    )
+
 # 2. Creación de la Clase Libro
-class Libro ():
+class Libro (metaclass=mostrarInfo):
     def __init__(self, titulo, autor, isbn, ano_publicacion, cant_paginas):
         self.titulo= titulo
         self.autor= autor
@@ -44,13 +62,21 @@ class Libro ():
             "Año de Publicación": self.ano_publicacion,
             "Cantidad de Páginas": self.cant_paginas
         }
+    
+    def mostrar_info(self):
+        return (
+            f"'{self.titulo}' de {self.autor} "
+            f"- ISBN: {self.isbn} "
+            f"- Año: {self.ano_publicacion}"
+        )
 
 # 3. Creación de la Clase Prestamo
-class Prestamo():
+class Prestamo(metaclass=mostrarInfo):
     def __init__(self, libro, usuario):
         self.libro = libro
         self.usuario = usuario
         self.fechaDePrestamo= date.today()
+        self.fechaLimite = date.today() + timedelta(days=90)
         self.fechaDeDevolucion= None
     
     def devolucion(self):
@@ -64,7 +90,18 @@ class Prestamo():
             f"Libro: {self.libro.titulo} | "
             f"Usuario: {self.usuario.nombre} {self.usuario.apellido} | "
             f"Fecha préstamo: {self.fechaDePrestamo} | "
+            f"Fecha límite: {self.fechaLimite} | "
             f"Fecha devolución: {self.fechaDeDevolucion}"
+        )
+    
+    def mostrar_info(self):
+        estado = "Activo" if self.prestamoActivo() else "Devuelto"
+        return (
+            f"Libro: {self.libro.titulo} | "
+            f"Usuario: {self.usuario.nombre} {self.usuario.apellido} | "
+            f"Fecha préstamo: {self.fechaDePrestamo} | "
+            f"Fecha límite: {self.fechaLimite} | "
+            f"Estado: {estado}"
         )
 
 
@@ -191,10 +228,10 @@ class Biblioteca():
                 p.devolucion()
                 print("Devolución registrada con éxito.")
                 return True
-            else:
-                print("No existe préstamo activo para ese libro.")
+
+        print("No existe préstamo activo para ese libro.")
         return False
-    
+            
     def listarPrestamosActivos(self):
         print("=== PRÉSTAMOS ACTIVOS ===")
         hay_prestamos = False
@@ -209,81 +246,89 @@ class Biblioteca():
 
 # PRUEBAS 
 
-# PRUEBAS DE BIBLIOTECA Y CRUD LIBROS
+# --------  PRUEBAS DE BIBLIOTECA Y CRUD LIBROS -------- 
 biblioteca = Biblioteca()
-
 libro1 = Libro("Harry Potter", "J.K. Rowling", "123", 1997, 300)
 libro2 = Libro("El Hobbit", "Tolkien", "456", 1937, 310)
 libro3 = Libro("El libro troll", "El Rubius", "789", 2014, 310)
 libro4 = Libro("Lyna Familia anormal", "Lyna Vallejos", "1011", 2018, 310)
-
 # Alta de Libros
 biblioteca.altaLibro(libro1)
 biblioteca.altaLibro(libro2)
 biblioteca.altaLibro(libro3)
 biblioteca.altaLibro(libro4)
-
 # Listado
 biblioteca.listaLibrosActuales()
-
 # Modificacion de datos
 biblioteca.modificarLibro("123", tituloNuevo="Harry Potter 2")
-
 # Listado Actualizado
 biblioteca.listaLibrosActualizados()
-
 # Baja de Libros
 biblioteca.baja("1011")
-
 # Listado Final
 biblioteca.listaLibrosActualizados()
 
-# PRUEBAS DE BIBLIOTECA Y CRUD LIBROS
+# -------- PRUEBAS DE BIBLIOTECA Y CRUD LIBROS --------
 usuario1 = Usuario("Juan", "Pérez", 12345678, "juan@gmail.com")
 usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com")
-
 # Alta de usuarios
 biblioteca.altaUsuario(usuario1)
 biblioteca.altaUsuario(usuario2)
-
 # Listado de usuarios
 biblioteca.listaUsuariosActuales()
-
 # Modificacion de datos
 biblioteca.modificarUsuario(12345678, nuevoEmail="juanperez@gmail.com")
-
 # Listado Actualizado
 biblioteca.listaUsuariosActualizados()
-
 # Baja de Usuario
 biblioteca.bajaUsuario(87654321)
-
 # Listado Final
 biblioteca.listaLibrosActualizados()
 
-
-# PRUEBAS DE CRUD PRESTAMOS
-
+# -------- PRUEBAS DE CRUD PRESTAMOS -------- 
 # Registo de Prestamos
 biblioteca.registroDePrestamo("123",12345678)
-
 # Lista de Prestamos Activos
 biblioteca.listarPrestamosActivos()
-
 # Registo de Prestamos 2
 biblioteca.registroDePrestamo("123",87654321)
-
 # Prueba de registro del mismo libro
 biblioteca.registroDePrestamo("456",87654321)
-
 # Ver préstamos activos
 biblioteca.listarPrestamosActivos()
-
 # Registrar devolución
 biblioteca.registrarDevolucion("123")
-
 # Ver préstamos activos luego de la devolución
 biblioteca.listarPrestamosActivos()
-
 # Intentar devolver nuevamente
 biblioteca.registrarDevolucion("123")
+# Libro inexistente
+biblioteca.registroDePrestamo("999",12345678)
+# Usuario inexistente
+biblioteca.registroDePrestamo("123",99999999)
+
+
+# -------- PRUEBAS DE POLIMORFISMO --------
+bibliotecario1 = Bibliotecario("Carlos", "López", "LEG-001")
+bibliotecario2 = Bibliotecario("Ana", "Martínez", "LEG-002")
+
+print("\n=== DEMOSTRACIÓN DE POLIMORFISMO ===")
+
+elementos = [libro1, libro2, usuario1, bibliotecario1, bibliotecario2]
+for e in elementos:
+    print(e.mostrar_info())
+
+# Registramos un préstamo nuevo para la demo
+biblioteca.registroDePrestamo("123", 12345678)
+prestamoDemo = biblioteca.prestamos[-1]  # ← el último registrado
+
+# Mostramos el préstamo ACTIVO
+print("\n--- Info de préstamo activo ---")
+print(prestamoDemo.mostrar_info())
+
+# Registramos la devolución
+biblioteca.registrarDevolucion("123")
+
+# Mostramos el mismo préstamo ahora DEVUELTO
+print("\n--- Info de préstamo devuelto ---")
+print(prestamoDemo.mostrar_info())
