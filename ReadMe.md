@@ -9,8 +9,8 @@ En este repositorio, se encuentra el Proyecto del Trabajo Integrador Final (TIF)
 - Grupo N°16
 - Universidad Nacional Guillermo Brown (UNAB)
 
-## 🧑‍🧑‍🧒‍🧒 Datos de los Integrantes:
-- Bustos Lisandro
+## 📋 Datos de los Integrantes:
+- Bustos Lisandro - 47.217.864
 - Cossio Benjamin
 - Gonzalez Enzo
 - Palacios Franco
