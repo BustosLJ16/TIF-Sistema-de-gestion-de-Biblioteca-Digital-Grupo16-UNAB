@@ -141,7 +141,14 @@ class Biblioteca():
 
     # CRUD DE LIBROS
     def altaLibro(self, libro):
+        for l in self.libros:
+            if l.isbn == libro.isbn:
+                print(f'Ya existe un libro con el ISBN {libro.isbn}.')
+                return False
+
         self.libros.append(libro)
+        print(f'El libro "{libro.titulo}" fue registrado con éxito.')
+        return True
     
     @mensajeListadoActuales
     def listaLibrosActuales(self):
@@ -185,12 +192,13 @@ class Biblioteca():
         for usuario in self.usuarios:
             print(f"Usuarios: {usuario.mostrar_info()}")
 
-    def modificarUsuario(self, dni, nuevoNombre=None, nuevoApellido=None, nuevoEmail=None):
+    def modificarUsuario(self, dni, nuevoNombre=None, nuevoApellido=None, nuevoEmail=None, nuevoPin=None):
         for u in self.usuarios:
             if u.dni == dni:
                 u.nombre = nuevoNombre or u.nombre
                 u.apellido = nuevoApellido or u.apellido
                 u.email = nuevoEmail or u.email
+                u.pin = nuevoPin or u.pin
                 print(f'El usuario con DNI "{dni}" fue modificado con éxito.')
                 return True
         return False
@@ -203,6 +211,27 @@ class Biblioteca():
                 return True
         return False
     
+    # CRUD BIBLIOTECARIOS
+    def altaBibliotecario(self, bibliotecario):
+        self.bibliotecarios.append(bibliotecario)
+        print(
+        f'El bibliotecario "{bibliotecario.nombre} {bibliotecario.apellido}" fue agregado con éxito!')
+
+    @mensajeListadoActuales
+    def listaBibliotecariosActuales(self):
+        for bibliotecario in self.bibliotecarios:
+            print(
+            f"Bibliotecario: {bibliotecario.mostrar_info()}")
+
+    def bajaBibliotecario(self, legajo):
+        for b in self.bibliotecarios:
+            if b.legajo == legajo:
+                self.bibliotecarios.remove(b)
+                print(
+                    f'El bibliotecario con legajo "{legajo}" fue eliminado con éxito.')
+            return True
+        return False
+
     # CRUD DE PRESTAMOS
     def registroDePrestamo(self, isbn, dni):
         libroEncontrado= None
@@ -257,125 +286,105 @@ class Biblioteca():
         if not hay_prestamos:
             print("No hay préstamos activos.")
 
-# PRUEBAS 
 
-# --------  PRUEBAS DE BIBLIOTECA Y CRUD LIBROS -------- 
-biblioteca = Biblioteca()
+biblioteca=Biblioteca()
+
 libro1 = Libro("Harry Potter", "J.K. Rowling", "123", 1997, 300)
-libro2 = Libro("El Hobbit", "Tolkien", "456", 1937, 310)
-libro3 = Libro("El libro troll", "El Rubius", "789", 2014, 310)
-libro4 = Libro("Lyna Familia anormal", "Lyna Vallejos", "1011", 2018, 310)
-# Alta de Libros
 biblioteca.altaLibro(libro1)
+libro2 = Libro("Harry Potter", "J.K. Rowling", "999", 1997, 300)
 biblioteca.altaLibro(libro2)
-biblioteca.altaLibro(libro3)
-biblioteca.altaLibro(libro4)
-# Listado
-biblioteca.listaLibrosActuales()
-# Modificacion de datos
-biblioteca.modificarLibro("123", tituloNuevo="Harry Potter 2")
-# Listado Actualizado
-biblioteca.listaLibrosActualizados()
-# Baja de Libros
-biblioteca.bajaLibro("1011")
-# Listado Final
-biblioteca.listaLibrosActualizados()
 
-# -------- PRUEBAS DE BIBLIOTECA Y CRUD LIBROS --------
 usuario1 = Usuario("Juan", "Pérez", 12345678, "juan@gmail.com", 1234)
-usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com", 1234)
-# Alta de usuarios
+usuario2 = Usuario("María", "Gómez", 87654321, "maria@gmail.com", 4321)
+
 biblioteca.altaUsuario(usuario1)
 biblioteca.altaUsuario(usuario2)
-# Listado de usuarios
+
 biblioteca.listaUsuariosActuales()
-# Modificacion de datos
-biblioteca.modificarUsuario(12345678, nuevoEmail="juanperez@gmail.com")
-# Listado Actualizado
-biblioteca.listaUsuariosActualizados()
-# Baja de Usuario
-biblioteca.bajaUsuario(87654321)
-# Listado Final
-biblioteca.listaLibrosActualizados()
 
-# -------- PRUEBAS DE CRUD PRESTAMOS -------- 
-# Registo de Prestamos
+bibliotecario01 = Bibliotecario("Susana", "Gutierrez", "LEG-821", 5678)
+bibliotecario02 = Bibliotecario("Luciano", "Castro", "LEG-301", 5678)
+
+biblioteca.altaBibliotecario(bibliotecario01)
+biblioteca.altaBibliotecario(bibliotecario02)
+
 biblioteca.registroDePrestamo("123",12345678)
-# Lista de Prestamos Activos
-biblioteca.listarPrestamosActivos()
-# Registo de Prestamos 2
 biblioteca.registroDePrestamo("123",87654321)
-# Prueba de registro del mismo libro
-biblioteca.registroDePrestamo("456",87654321)
-# Ver préstamos activos
 biblioteca.listarPrestamosActivos()
-# Registrar devolución
-biblioteca.registrarDevolucion("123")
-# Ver préstamos activos luego de la devolución
-biblioteca.listarPrestamosActivos()
-# Intentar devolver nuevamente
-biblioteca.registrarDevolucion("123")
-# Libro inexistente
-biblioteca.registroDePrestamo("999",12345678)
-# Usuario inexistente
-biblioteca.registroDePrestamo("123",99999999)
 
+# ------------------------------ FUNCIONES USUARIO ------------------------------
+def usuarioHacerPrestamo(usuario, biblioteca):
+    print(
+        f'---------- Registrar Prestamo ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    d= int(input('DNI (Solo Números sin . ni -): '))
+    i= input("Ingrese ISBN del libro: ")
+    if usuario.dni == d:
+        biblioteca.registroDePrestamo(
+            i, usuario.dni)
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente')
+        usuarioHacerPrestamo()
 
-# -------- PRUEBAS DE POLIMORFISMO --------
-bibliotecario1 = Bibliotecario("Carlos", "López", "LEG-001", 9876)
-bibliotecario2 = Bibliotecario("Ana", "Martínez", "LEG-002", 6789)
+def usuarioDevolucionPrestamo(usuario, biblioteca):
+    print(
+        f'---------- Registrar Prestamo ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    d= int(input('DNI (Solo Números sin . ni -): '))
+    i= input("Ingrese ISBN del libro: ")
 
-print("\n=== DEMOSTRACIÓN DE POLIMORFISMO ===")
+    if usuario.dni == d:
+        biblioteca.registrarDevolucion(i)
+        print("Devolución registrada correctamente.")
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente')
+        usuarioDevolucionPrestamo()
 
-elementos = [libro1, libro2, usuario1, bibliotecario1, bibliotecario2]
-for e in elementos:
-    print(e.mostrar_info())
-
-# Registramos un préstamo nuevo para la demo
-biblioteca.registroDePrestamo("123", 12345678)
-prestamoDemo = biblioteca.prestamos[-1]  # ← el último registrado
-
-# Mostramos el préstamo ACTIVO
-print("\n--- Info de préstamo activo ---")
-print(prestamoDemo.mostrar_info())
-
-# Registramos la devolución
-biblioteca.registrarDevolucion("123")
-
-# Mostramos el mismo préstamo ahora DEVUELTO
-print("\n--- Info de préstamo devuelto ---")
-print(prestamoDemo.mostrar_info())
-
-print("\n=== PRUEBA DE SINGLETON ===")
-b1 = Biblioteca()
-b2 = Biblioteca()
-print(b1 is b2)
-libro_prueba = Libro("Harry Potter","J.K. Rowling","999",1997,300)
-b1.libros.append(libro_prueba)
-for libro in b2.libros:
-    print(libro.mostrar_info())
-
-
+def usuarioModificarCuenta(usuario, biblioteca):
+    print(
+        f'---------- Modificar Cuenta ----------\n'
+        f'Por favor, complete los siguientes campos - Deje vacío el dato que no quiera modificar: ')
+    d= int(input('DNI (Solo Números sin . ni -): '))
+    nn= input('Ingrese Nuevo Nombre: ')
+    na= input('Ingrese Nuevo Apellido: ')
+    ne= input('Ingrese Nuevo Email: ')
+    np= input('Ingrese Nuevo Pin (Solo Número): ')
+    if usuario.dni == d:
+        biblioteca.modificarUsuario(
+            usuario.dni,
+            nn if nn else None,
+            na if na else None,
+            ne if ne else None,
+            np if np else None
+        )
+    else:
+        print('Las Credenciales son Incorrectas. Intente Nuevamente.')
+        usuarioModificarCuenta(usuario, biblioteca)
+# ------------------------------ MENÚ USUARIO ------------------------------
 def menuUsuario(usuario, biblioteca):
     print(               
         f'-------------------- Menú --------------------\n'
         f'Hola, {usuario.nombre} {usuario.apellido}!\n'
         f'Por favor Indique la opción que desea ejecutar:\n'
-        f'1. Prestamo de un Libro.\n'
-        f'2. Devolución de un Libro.\n'
-        f'3. Modificar un dato de mi cuenta.\n'
+        f'1. Lista de Libros Actuales.\n'
+        f'2. Prestamo de un Libro.\n'
+        f'3. Devolución de un Libro.\n'
+        f'4. Modificar un dato de mi cuenta.\n'
         f'0. Salir.\n'
         f'----------------------------------------------')
     opcion=input('Ingrese opción deseada: ')
     while True :
         if opcion == '1':
-            print('111')
+            biblioteca.listaLibrosActuales()
             break
         elif opcion == '2':
-            print('222')
+            usuarioHacerPrestamo(usuario, biblioteca)
             break
         elif opcion == '3':
-            print('333')
+            usuarioDevolucionPrestamo(usuario, biblioteca)
+            break
+        elif opcion == '4':
+            usuarioModificarCuenta(usuario, biblioteca)
             break
         elif opcion == '0':
             print('Hasta Luego!')
@@ -391,8 +400,68 @@ def menuUsuario(usuario, biblioteca):
                 f'0. Salir.\n'
                 f'----------------------------------------------')
             opcion=input('Ingrese opción deseada: ')
-# menuUsuario(usuario=usuario1 ,biblioteca='')
 
+# ------------------------------ FUNCIONES BIBLIOTECARIO ------------------------------
+def bibliotecarioAltaLibro(bibliotecario, biblioteca):
+    print(
+        f'---------- Registrar Libro Nuevo ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    l=int(input('Ingrese su N° de Legajo: '))
+    if bibliotecario.legajo == 'LEG-'+str(l):
+        t=input('Ingrese el Título: ')
+        a=input('Ingrese el Autor: ')
+        i=input('Ingrese el ISBN: ')
+        ap= int(input('Ingrese el Año de Publicación: '))
+        p= int(input('Ingrese la Cantidad de Páginas: '))
+        libro= Libro(t,a,i,ap,p)
+        biblioteca.altaLibro(libro)
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente.')
+        bibliotecarioAltaLibro(bibliotecario, biblioteca)
+
+def bibliotecarioModificarLibro(bibliotecario, biblioteca):
+    print(
+        f'---------- Modificar Libro  ----------\n'
+        f'Por favor, complete los siguientes campos - Deje vacío el dato que no quiera modificar: ')
+    l=int(input('Ingrese su N° de Legajo: '))
+    if bibliotecario.legajo == 'LEG-'+str(l):
+        i= input('Ingrese ISBN del libro: ')
+        nt= input('Ingrese el Nuevo Título: ')
+        na= input('Ingrese el Nuevo Autor: ')
+        biblioteca.modificarLibro(
+            i,
+            nt if nt else None,
+            na if na else None
+        )
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente.')
+        bibliotecarioModificarLibro(bibliotecario, biblioteca)
+
+def bibliotecarioBajaLibro(bibliotecario, biblioteca):
+    print(
+        f'---------- Dar de Baja un Libro ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    l=int(input('Ingrese su N° de Legajo: '))
+    if bibliotecario.legajo == 'LEG-'+str(l):
+        i= input('Ingrese ISBN del libro: ')
+        biblioteca.bajaLibro(i)
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente.')
+        bibliotecarioBajaLibro(bibliotecario, biblioteca)
+
+def bibliotecarioBajaUsuarios(bibliotecario, biblioteca):
+    print(
+        f'---------- Dar de Baja Un Usuario ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    l=int(input('Ingrese su N° de Legajo: '))
+    if bibliotecario.legajo == 'LEG-'+str(l):
+        d= int(input('DNI del Usuario (Solo Números sin . ni -): '))
+        biblioteca.bajaUsuario(d)
+    else:
+        print('Los Datos son Incorrectos. Intente Nuevamente.')
+        bibliotecarioBajaUsuarios(bibliotecario, biblioteca)
+
+# ------------------------------ MENÚ BIBLIOTECARIO ------------------------------
 def menuBibliotecario(bibliotecario, biblioteca):
     print(               
         f'-------------------- Menú --------------------\n'
@@ -400,7 +469,7 @@ def menuBibliotecario(bibliotecario, biblioteca):
         f'Por favor Indique la opción que desea ejecutar:\n'
         f'1. Alta de un Libro.\n'
         f'2. Listado de Libros.\n'
-        f'3. Modigicación de un Libro.\n'
+        f'3. Modificación de un Libro.\n'
         f'4. Baja de un Libro.\n'
         f'5. Prestamos Vigentes.\n'
         f'6. Lista de Usuarios.\n'
@@ -411,25 +480,25 @@ def menuBibliotecario(bibliotecario, biblioteca):
 
     while True:
         if opcion == '1':
-            print('111')
+            bibliotecarioAltaLibro(bibliotecario, biblioteca)
             break
         elif opcion == '2':
-            print('222')
+            biblioteca.listaLibrosActuales()
             break
         elif opcion == '3':
-            print('333')
+            bibliotecarioModificarLibro(bibliotecario,biblioteca)
             break
         elif opcion == '4':
-            print('444')
+            bibliotecarioBajaLibro(bibliotecario, biblioteca)
             break
         elif opcion == '5':
-            print('555')
+            biblioteca.listarPrestamosActivos()
             break
         elif opcion == '6':
-            print('666')
+            biblioteca.listaUsuariosActuales()
             break
         elif opcion == '7':
-            print('777')
+            bibliotecarioBajaUsuarios(bibliotecario,biblioteca)
             break
         elif opcion == '0':
             print('Hasta Luego!')
@@ -449,8 +518,66 @@ def menuBibliotecario(bibliotecario, biblioteca):
                 f'0. Salir.\n'
                 f'----------------------------------------------')
             opcion=input('Ingrese opción deseada: ')
-# menuBibliotecario(bibliotecario=bibliotecario1, biblioteca='')
 
+# ------------------------------ MENÚ INICIO SESION / REGISTRO ------------------------------
+def menuRegistroUsuario():
+    print(
+        f'---------- Registro de Usuario ----------\n'
+        f'Por favor, complete los siguientes campos:')
+    n=input('Nombre: ')
+    a=input('Apellido: ')
+    d=int(input('DNI (Solo Números sin . ni -): '))
+    e=input('Email: ')
+    p=int(input('Pin (Solo Números): '))
+    nuevoUsuario= Usuario(nombre=n, apellido=a, dni=d, email=e, pin=p)
+    biblioteca.altaUsuario(nuevoUsuario)
+    return nuevoUsuario
+
+def menuSesionUsuario():
+    print(
+    f'---------- Inicio de Sesión ----------\n'
+    f'Por favor, Brinde estos datos:\n')
+    d=int(input('Su DNI (Sin . ni -): '))
+    p=int(input('Pin (Solo Números): '))
+    for u in biblioteca.usuarios:
+        if u.dni == d and u.pin == p:
+            menuUsuario(u, biblioteca)
+            return
+    print(
+    f'---------- Datos Incorrectos, vuelva a intentarlo ----------\n')
+    menuSesionUsuario()
+
+def menuSesionBibliotecario():
+    print(
+    f'---------- Inicio de Sesión ----------\n'
+    f'Por favor, Brinde estos datos:')
+    l=int(input('Su N° de Legajo: '))
+    p=int(input('Pin (Solo Números): '))
+    for b in biblioteca.bibliotecarios:
+        if b.legajo == ('LEG-'+ str(l)) and b.pin == p:
+            menuBibliotecario(b,biblioteca)
+            return
+    print(
+    f'---------- Datos Incorrectos, vuelva a intentarlo ----------\n')
+    menuSesionBibliotecario()
+
+def menuTipoPersona():
+    print(
+    f'---------- Selección de Logueo ----------\n'
+    f'Por favor, seleccione su Rol:\n'
+    f'1. Usuario.\n'
+    f'2. Bibliotecario.\n'
+    f'0. Salir.\n'
+    f'----------------------------------------------')
+    opcion=input('Ingrese opción deseada: ')
+    if opcion == '1':
+        menuSesionUsuario()
+    elif opcion == '2':
+        menuSesionBibliotecario()
+    elif opcion == '0':
+        menuPrincipal()
+
+# ------------------------------ MENÚ PRINCIPAL ------------------------------
 def menuPrincipal():
     print(
         f'-------------------- Menú --------------------\n'
@@ -459,25 +586,15 @@ def menuPrincipal():
         f'1. Iniciar Sesión.\n'
         f'2. Registrarme.\n'
         f'0. Salir.\n'
-        f'----------------------------------------------'
-    )
+        f'----------------------------------------------')
     opcion=input('Ingrese opción deseada: ')
     while True:
         if opcion == '1':
-            print('Opcion 1')
+            menuTipoPersona()
             break
         elif opcion == '2':
-            print(
-                f'---------- Registro de Usuario ----------\n'
-                f'Por favor, complete los siguientes campos:'
-            )
-            n=input('Nombre: ')
-            a=input('Apellido: ')
-            d=int(input('DNI: (Solo Números sin . ni -)'))
-            e=input('Email: ')
-            p=int(input('Pin: (Solo Números)'))
-            nuevoUsuario= Usuario(nombre=n, apellido=a, dni=d, email=e, pin=p)
-            biblioteca.altaUsuario(nuevoUsuario)
+            usuario=menuRegistroUsuario()
+            menuUsuario(usuario, biblioteca)
             break
         elif opcion == '0':
             print ('Hasta Luego!')
@@ -494,3 +611,4 @@ def menuPrincipal():
             )
             opcion=input('Ingrese opción deseada: ')
 menuPrincipal()
+
