@@ -223,8 +223,8 @@ class Biblioteca():
                 print(
                     f'Ya existe un bibliotecario con el legajo '
                     f'{bibliotecario.legajo}.')
-            return False
-        
+                return False
+
         self.bibliotecarios.append(bibliotecario)
         print(
             f'El bibliotecario "{bibliotecario.nombre} '
@@ -239,11 +239,11 @@ class Biblioteca():
 
     def bajaBibliotecario(self, legajo):
         for b in self.bibliotecarios:
-            if b.legajo == legajo:
+            if b.legajo  == 'LEG-'+str(legajo):
                 self.bibliotecarios.remove(b)
                 print(
                     f'El bibliotecario con legajo "{legajo}" fue eliminado con éxito.')
-            return True
+                return True
         return False
 
     # -------------------- CRUD de Prestamos --------------------
