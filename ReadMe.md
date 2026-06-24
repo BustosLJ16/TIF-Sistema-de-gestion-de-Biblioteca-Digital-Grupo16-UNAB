@@ -13,7 +13,7 @@ En este repositorio, se encuentra el Proyecto del Trabajo Integrador Final (TIF)
 - Bustos Lisandro - 47.217.864
 - Cossio Benjamin - 47.877.576
 - Gonzalez Enzo -   48.101.830
-- Palacios Franco -
+- Palacios Franco - 45.300.452
 
 ## 🎯 Objetivo
 Desarrollar un sistema de gestión bibliotecaria que permita administrar libros, usuarios, bibliotecarios y préstamos, aplicando conceptos avanzados de programación orientada a objetos en Python.
